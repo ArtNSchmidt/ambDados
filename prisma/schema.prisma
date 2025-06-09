@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Departamento {
+  id_departamento Int       @id
+  nome_departamento String
+  descricao         String
+  Medicos           Medico[]
+  Exames            Exame[]
+}
+
+model PlanoSaude {
+  id_plano       Int       @id
+  nome_plano     String
+  codigo_operadora String
+  tipo_cobertura String
+  Atendimentos   Atendimento[]
+  Exames         Exame[]
+}
+
+model Paciente {
+  id_paciente    Int           @id
+  nome           String
+  cpf            String
+  data_nascimento DateTime
+  sexo           String
+  endereco       String
+  email          String
+  Atendimentos   Atendimento[]
+  Exames         Exame[]
+  Prescricoes    Prescricao[]
+}
+
+model Sala {
+  id_sala     Int         @id
+  numero_sala Int
+  tipo_sala   String
+  andar       Int
+  Atendimentos Atendimento[]
+  Exames       Exame[]
+}
+
+model Medico {
+  id_medico     Int           @id
+  nome_med      String
+  crm           String
+  especialidade String
+  telefone      String
+  email         String
+  departamento  Departamento @relation(fields: [departamento_id], references: [id_departamento])
+  departamento_id Int
+  Atendimentos   Atendimento[]
+  Exames         Exame[]
+  Prescricoes    Prescricao[]
+}
+
+model Enfermeiro {
+  id_enfermeiro Int         @id
+  nome_enfermeiro String
+  registro_coren String
+  turno          String
+  telefone       String
+  email          String
+  Atendimentos   Atendimento[]
+}
+
+model Atendimento {
+  id_atendimento Int       @id
+  tipo_consulta  String
+  data_hora      DateTime
+  paciente       Paciente  @relation(fields: [paciente_id], references: [id_paciente])
+  paciente_id    Int
+  medico         Medico    @relation(fields: [medico_id], references: [id_medico])
+  medico_id      Int
+  sala           Sala      @relation(fields: [sala_id], references: [id_sala])
+  sala_id        Int
+  enfermeiro     Enfermeiro @relation(fields: [enfermeiro_id], references: [id_enfermeiro])
+  enfermeiro_id  Int
+  plano          PlanoSaude @relation(fields: [plano_id], references: [id_plano])
+  plano_id       Int
+}
+
+model Exame {
+  id_exame      Int        @id
+  nome_exame    String
+  descricao     String
+  data_exame    DateTime
+  resultado     String
+  paciente      Paciente   @relation(fields: [paciente_id], references: [id_paciente])
+  paciente_id   Int
+  medico        Medico     @relation(fields: [medico_id], references: [id_medico])
+  medico_id     Int
+  departamento  Departamento @relation(fields: [departamento_id], references: [id_departamento])
+  departamento_id Int
+  sala          Sala       @relation(fields: [sala_id], references: [id_sala])
+  sala_id       Int
+  plano         PlanoSaude @relation(fields: [plano_id], references: [id_plano])
+  plano_id      Int
+}
+
+model Medicamento {
+  id_medicamento  Int                      @id
+  nome_comercial  String
+  principio_ativo String
+  formatacao      String
+  dosagem_padrao  String
+  Prescricoes     PrescricaoMedicamento[]
+}
+
+model Prescricao {
+  id_prescricao Int         @id
+  data_emissao  DateTime
+  validade      String
+  instrucao     String
+  paciente      Paciente    @relation(fields: [paciente_id], references: [id_paciente])
+  paciente_id   Int
+  medico        Medico      @relation(fields: [medico_id], references: [id_medico])
+  medico_id     Int
+  Medicamentos  PrescricaoMedicamento[]
+}
+
+model PrescricaoMedicamento {
+  id_prescricao_med Int          @id
+  medicamento       Medicamento @relation(fields: [id_medicamento], references: [id_medicamento])
+  id_medicamento     Int
+  prescricao         Prescricao @relation(fields: [id_prescricao], references: [id_prescricao])
+  id_prescricao       Int
+}
