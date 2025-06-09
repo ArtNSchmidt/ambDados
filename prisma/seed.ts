@@ -20,11 +20,9 @@ async function main() {
   for (let i = 0; i < TOTAL_DEPARTAMENTOS; i++) {
     await prisma.departamento.create({
       data: {
-        id_departamento:,
         nome_departamento: faker.commerce.department(),
         descricao: faker.lorem.sentence(),
-        Medicos:,
-        Exames,
+        id_departamento: faker.number.int({ min: 1, max: TOTAL_DEPARTAMENTOS }),
       },
     })
   }
@@ -35,10 +33,8 @@ async function main() {
       data: {
         nome_plano: faker.company.name(),
         codigo_operadora: faker.string.alphanumeric(8),
-        id_plano
-        Atendimentos
-        Exames
         tipo_cobertura: faker.helpers.arrayElement(['Completa', 'Ambulatorial', 'Hospitalar']),
+        id_plano: faker.number.int({ min: 1, max: TOTAL_PLANOS }),
       },
     })
   }
@@ -47,45 +43,41 @@ async function main() {
   for (let i = 0; i < TOTAL_SALAS; i++) {
     await prisma.sala.create({
       data: {
-        id_sala,
-        Atendimentos
-        Exames
         numero_sala: faker.number.int({ min: 1, max: 200 }),
         tipo_sala: faker.helpers.arrayElement(['Cirurgia', 'Consulta', 'UTI', 'Observação']),
         andar: faker.number.int({ min: 1, max: 10 }),
+        id_sala: faker.number.int({ min: 1, max: TOTAL_SALAS }),
       },
     })
   }
 
-  console.log(`Inserindo ${TOTAL_MEDICOS} médicos...`)
-  for (let i = 0; i < TOTAL_MEDICOS; i++) {
-    await prisma.medico.create({
-      data: {
-        id_medico
-        Atendimentos
-        Exames
-        Prescricoes
-        nome_med: faker.person.fullName(),
-        crm: faker.string.alphanumeric(10),
-        especialidade: faker.person.jobType(),
-        telefone: faker.phone.number(),
-        email: faker.internet.email(),
-        departamento_id: faker.number.int({ min: 1, max: TOTAL_DEPARTAMENTOS }),
-      },
-    })
-  }
+console.log(`Inserindo ${TOTAL_MEDICOS} médicos...`)
+for (let i = 0; i < TOTAL_MEDICOS; i++) {
+  await prisma.medico.create({
+    data: {
+      nome_med: faker.person.fullName(),
+      crm: faker.string.alphanumeric(10),
+      especialidade: faker.person.jobType(),
+      telefone: faker.phone.number(),
+      email: faker.internet.email(),
+      departamento_id: faker.number.int({ min: 1, max: TOTAL_DEPARTAMENTOS }),
+      id_medico: faker.number.int({ min: 1, max: TOTAL_MEDICOS }),
+    },
+  })
+}
 
   console.log(`Inserindo ${TOTAL_ENFERMEIROS} enfermeiros...`)
   for (let i = 0; i < TOTAL_ENFERMEIROS; i++) {
     await prisma.enfermeiro.create({
       data: {
-        id_enfermeiro
-        Atendimentos
         nome_enfermeiro: faker.person.fullName(),
         registro_coren: faker.string.alphanumeric(8),
         turno: faker.helpers.arrayElement(['Manhã', 'Tarde', 'Noite']),
         telefone: faker.phone.number(),
         email: faker.internet.email(),
+        id_enfermeiro: faker.number.int({ min: 1, max: TOTAL_ENFERMEIROS }),
+     
+
       },
     })
   }
@@ -94,16 +86,13 @@ async function main() {
   for (let i = 0; i < TOTAL_PACIENTES; i++) {
     await prisma.paciente.create({
       data: {
-        id_paciente,
-        Atendimentos
-        Exames
-        Prescricoes
         nome: faker.person.fullName(),
         cpf: faker.string.numeric(11),
         data_nascimento: faker.date.birthdate({ min: 0, max: 100, mode: 'age' }),
         sexo: faker.helpers.arrayElement(['Masculino', 'Feminino']),
         endereco: faker.location.streetAddress(),
         email: faker.internet.email(),
+        id_paciente: faker.number.int({ min: 1, max: TOTAL_PACIENTES }),
       },
     })
   }
@@ -112,11 +101,11 @@ async function main() {
   for (let i = 0; i < TOTAL_MEDICAMENTOS; i++) {
     await prisma.medicamento.create({
       data: {
-        id_medicamento,
         nome_comercial: faker.commerce.productName(),
         principio_ativo: faker.science.chemicalElement().name,
         formatacao: faker.helpers.arrayElement(['Comprimido', 'Xarope', 'Injetável']),
         dosagem_padrao: faker.string.alphanumeric(5),
+        id_medicamento: faker.number.int({ min: 1, max: TOTAL_MEDICAMENTOS }),
       },
     })
   }
@@ -125,12 +114,12 @@ async function main() {
   for (let i = 0; i < TOTAL_PRESCRICOES; i++) {
     await prisma.prescricao.create({
       data: {
-        id_prescricao,
         data_emissao: faker.date.past(),
         validade: faker.date.future().toISOString(),
         instrucao: faker.lorem.sentence(),
         paciente_id: faker.number.int({ min: 1, max: TOTAL_PACIENTES }),
         medico_id: faker.number.int({ min: 1, max: TOTAL_MEDICOS }),
+        id_prescricao: faker.number.int({ min: 1, max: TOTAL_PRESCRICOES }),
       },
     })
   }
@@ -139,9 +128,9 @@ async function main() {
   for (let i = 0; i < TOTAL_PRESC_MED; i++) {
     await prisma.prescricaoMedicamento.create({
       data: {
-        id_prescricao_medicamento: faker.string.uuid(),
         id_medicamento: faker.number.int({ min: 1, max: TOTAL_MEDICAMENTOS }),
         id_prescricao: faker.number.int({ min: 1, max: TOTAL_PRESCRICOES }),
+        id_prescricao_med: faker.number.int({ min: 1, max: TOTAL_PRESC_MED }),
       },
     })
   }
@@ -150,7 +139,6 @@ async function main() {
   for (let i = 0; i < TOTAL_ATENDIMENTOS; i++) {
     await prisma.atendimento.create({
       data: {
-        id_atendimento
         tipo_consulta: faker.helpers.arrayElement(['Consulta', 'Emergência', 'Internação']),
         data_hora: faker.date.recent(),
         paciente_id: faker.number.int({ min: 1, max: TOTAL_PACIENTES }),
@@ -158,6 +146,7 @@ async function main() {
         sala_id: faker.number.int({ min: 1, max: TOTAL_SALAS }),
         enfermeiro_id: faker.number.int({ min: 1, max: TOTAL_ENFERMEIROS }),
         plano_id: faker.number.int({ min: 1, max: TOTAL_PLANOS }),
+        id_atendimento: faker.number.int({ min: 1, max: TOTAL_ATENDIMENTOS }),
       },
     })
   }
@@ -175,6 +164,7 @@ async function main() {
         departamento_id: faker.number.int({ min: 1, max: TOTAL_DEPARTAMENTOS }),
         sala_id: faker.number.int({ min: 1, max: TOTAL_SALAS }),
         plano_id: faker.number.int({ min: 1, max: TOTAL_PLANOS }),
+        id_exame: faker.number.int({ min: 1, max: TOTAL_EXAMES }),
       },
     })
   }
@@ -184,6 +174,7 @@ async function main() {
 
 main()
   .then(async () => {
+    console.log("Tarefa Finalizada!")
     await prisma.$disconnect()
   })
   .catch(async (e) => {
